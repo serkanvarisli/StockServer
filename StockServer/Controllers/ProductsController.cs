@@ -20,17 +20,17 @@ namespace StockServer.Controllers
         public async Task<IActionResult> GetAll()
         {
             var products = await _stockDbContext.Products
-                .Include(p=>p.Category)
+                .Include(p => p.Category)
                 .Where(p => p.Stock != default)
-                .Select(p =>new GetAllProductDTO
+                .Select(p => new GetAllProductDTO
                 {
                     Id = p.Id,
                     Name = p.Name,
-                    Description= p.Description,
-                    Stock= p.Stock,
+                    Description = p.Description,
+                    Stock = p.Stock,
                     TagName = p.Tags.Select(c => c.Name).ToList(),
-                    CategoryName=p.Category.Name,
-                } )
+                    CategoryName = p.Category.Name,
+                })
                 .ToListAsync();
 
             return Ok(products);
@@ -53,35 +53,39 @@ namespace StockServer.Controllers
 
             await _stockDbContext.SaveChangesAsync();
 
-            return StatusCode(201,addProduct.Id);
+            return StatusCode(201, addProduct.Id);
         }
 
-        [HttpPut("updatestock/{id}")]
+        [HttpPut]
         public async Task<IActionResult> UpdateStock(Guid id, UpdateProductDTO updateStockDTO)
         {
-            try
+            var product = await _stockDbContext.Products.FirstOrDefaultAsync(p => p.Id == id);
+
+            if (product == null)
             {
-                // İlgili ürünü veritabanından bulun
-                var product = await _stockDbContext.Products.FirstOrDefaultAsync(p => p.Id == id);
-
-                // Eğer ürün bulunamazsa, hata mesajı döndürün
-                if (product == null)
-                {
-                    return NotFound("Ürün bulunamadı.");
-                }
-
-                // Stok güncellemesi yapın
-                product.Stock = updateStockDTO.Stock;
-
-                // Veritabanını güncelleyin
-                await _stockDbContext.SaveChangesAsync();
-
-                return Ok(product); // Güncellenen ürün bilgisini döndürün
+                return NotFound("Ürün bulunamadı.");
             }
-            catch (Exception ex)
+
+            product.Stock = updateStockDTO.Stock;
+
+            await _stockDbContext.SaveChangesAsync();
+
+            return Ok(product);
+        }
+        [HttpDelete]
+        public async Task<IActionResult> DeleteProduct(Guid id)
+        {
+            var product = await _stockDbContext.Products.FirstOrDefaultAsync(p => p.Id == id);
+
+            if (product == null)
             {
-                return BadRequest($"Hata: {ex.Message}");
+                return NotFound("Ürün bulunamadı.");
             }
+
+            _stockDbContext.Products.Remove(product);
+            await _stockDbContext.SaveChangesAsync();
+
+            return NoContent(); 
         }
     }
 
