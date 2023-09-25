@@ -55,5 +55,35 @@ namespace StockServer.Controllers
 
             return StatusCode(201,addProduct.Id);
         }
+
+        [HttpPut("updatestock/{id}")]
+        public async Task<IActionResult> UpdateStock(Guid id, UpdateProductDTO updateStockDTO)
+        {
+            try
+            {
+                // İlgili ürünü veritabanından bulun
+                var product = await _stockDbContext.Products.FirstOrDefaultAsync(p => p.Id == id);
+
+                // Eğer ürün bulunamazsa, hata mesajı döndürün
+                if (product == null)
+                {
+                    return NotFound("Ürün bulunamadı.");
+                }
+
+                // Stok güncellemesi yapın
+                product.Stock = updateStockDTO.Stock;
+
+                // Veritabanını güncelleyin
+                await _stockDbContext.SaveChangesAsync();
+
+                return Ok(product); // Güncellenen ürün bilgisini döndürün
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Hata: {ex.Message}");
+            }
+        }
     }
+
 }
+
