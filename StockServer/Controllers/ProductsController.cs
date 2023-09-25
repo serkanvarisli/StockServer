@@ -46,7 +46,7 @@ namespace StockServer.Controllers
                 Name = createProductDTO.Name,
                 Description = createProductDTO.Description,
                 Stock = createProductDTO.Stock,
-                Tags= tags,
+                Tags = tags,
             };
 
             await _stockDbContext.Products.AddAsync(addProduct);
