@@ -20,7 +20,7 @@ namespace StockServer.Controllers
         public async Task<IActionResult> GetAll()
         {
             var products = await _stockDbContext.Products
-                .Include(p=>p.Categories)
+                .Include(p=>p.Category)
                 .Where(p => p.Stock != default)
                 .Select(p =>new GetAllProductDTO
                 {
@@ -28,7 +28,8 @@ namespace StockServer.Controllers
                     Name = p.Name,
                     Description= p.Description,
                     Stock= p.Stock,
-                    CategoryName = p.Categories.Select(c => c.Name).ToList()
+                    TagName = p.Tags.Select(c => c.Name).ToList(),
+                    CategoryName=p.Category.Name,
                 } )
                 .ToListAsync();
 
@@ -37,14 +38,15 @@ namespace StockServer.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateProductDTO createProductDTO)
         {
-            var categories = await _stockDbContext.Categories.Where(c => createProductDTO.CategoryIds.Contains(c.Id)).ToListAsync();
+            var tags = await _stockDbContext.Tags.Where(c => createProductDTO.TagNames.Contains(c.Name)).ToListAsync();
 
             var addProduct = new Product
             {
-                Categories = categories,
+                CategoryId = createProductDTO.CategoryId,
                 Name = createProductDTO.Name,
                 Description = createProductDTO.Description,
                 Stock = createProductDTO.Stock,
+                Tags= tags,
             };
 
             await _stockDbContext.Products.AddAsync(addProduct);

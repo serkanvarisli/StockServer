@@ -6,7 +6,9 @@
         public string Name { get; set; }
         public string Description { get; set; }
         public int Stock { get; set; }
-        public List<string> CategoryName { get; set; }
+        public string CategoryName { get; set; }
+        public List<string> TagName { get; set; }
+
 
     }
 }

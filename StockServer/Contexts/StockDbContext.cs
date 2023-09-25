@@ -7,6 +7,7 @@ namespace StockServer.Contexts
     {
         public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Tag> Tags { get; set; }
 
         public StockDbContext(DbContextOptions<StockDbContext> options):base(options) { }
     }
