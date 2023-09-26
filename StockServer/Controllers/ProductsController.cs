@@ -36,6 +36,22 @@ namespace StockServer.Controllers
 
             return Ok(products);
         }
+        [HttpGet("Category")]
+        public async Task<IActionResult> GetCategories()
+        {
+            var categories = await _stockDbContext.Categories
+                .ToListAsync();
+            return Ok(categories);
+        }
+        [HttpGet("Tags")]
+        public async Task<IActionResult> GetTags()
+        {
+            var Tags = await _stockDbContext.Tags
+                .ToListAsync();
+            return Ok(Tags);
+        }
+
+
         [HttpPost]
         public async Task<IActionResult> Create(CreateProductDTO createProductDTO)
         {
@@ -57,7 +73,6 @@ namespace StockServer.Controllers
             return StatusCode(201, addProduct.Id);
         }
 
-
         [HttpPut]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateStock(Guid id, UpdateProductDTO updateStockDTO)
@@ -66,8 +81,6 @@ namespace StockServer.Controllers
             {
                 return Unauthorized();
             }
-
-            // Check if the user has the Admin role
             if (!User.IsInRole("Admin"))
             {
                 return Forbid();
