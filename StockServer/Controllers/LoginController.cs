@@ -32,13 +32,21 @@ namespace StockServer.Controllers
                 List<Claim> claims = new List<Claim>();
                 claims.Add(new Claim(ClaimTypes.NameIdentifier, model.Username));
 
+                if (user.Username != "admin")
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, "User"));
+                }
+                else
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, "Admin"));
+                }
 
                 ClaimsIdentity identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 ClaimsPrincipal principal = new ClaimsPrincipal(identity);
 
                 await HttpContext.SignInAsync(principal, new AuthenticationProperties() { IsPersistent = false });
 
-                return StatusCode(200,model.Username);
+                return StatusCode(200, model.Username);
             }
 
             return BadRequest();

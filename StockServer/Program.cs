@@ -11,6 +11,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         // Role gereksinimleri burada tanýmlanýr
         options.AccessDeniedPath = "/Login/AccessDenied"; // Eriþim reddedildiðinde yönlendirme
     });
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("CanUpdateStock", policy => policy.RequireRole("Admin"));
+});
 builder.Services.AddDbContext<StockDbContext>(options=>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));

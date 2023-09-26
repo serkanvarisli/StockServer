@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StockServer.Contexts;
@@ -56,14 +57,27 @@ namespace StockServer.Controllers
             return StatusCode(201, addProduct.Id);
         }
 
+
         [HttpPut]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateStock(Guid id, UpdateProductDTO updateStockDTO)
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return Unauthorized();
+            }
+
+            // Check if the user has the Admin role
+            if (!User.IsInRole("Admin"))
+            {
+                return Forbid();
+            }
+
             var product = await _stockDbContext.Products.FirstOrDefaultAsync(p => p.Id == id);
 
             if (product == null)
             {
-                return NotFound("Ürün bulunamadı.");
+                return BadRequest("Ürün bulunamadı.");
             }
 
             product.Stock = updateStockDTO.Stock;
