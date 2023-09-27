@@ -86,17 +86,17 @@ namespace StockServer.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
+        // [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateStock(Guid id, UpdateProductDTO updateStockDTO)
         {
-            if (!User.Identity.IsAuthenticated)
-            {
-                return Unauthorized();
-            }
-            if (!User.IsInRole("Admin"))
-            {
-                return Forbid();
-            }
+            //if (!User.Identity.IsAuthenticated)
+            //{
+            //    return Unauthorized();
+            //}
+            //if (!User.IsInRole("Admin"))
+            //{
+            //    return Forbid();
+            //}
 
             var product = await _stockDbContext.Products.FirstOrDefaultAsync(p => p.Id == id);
 
@@ -105,12 +105,14 @@ namespace StockServer.Controllers
                 return BadRequest("Ürün bulunamadı.");
             }
 
+            // Yalnızca "Stock" alanını güncelle
             product.Stock = updateStockDTO.Stock;
 
             await _stockDbContext.SaveChangesAsync();
 
             return Ok(product);
         }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(Guid id)
         {
