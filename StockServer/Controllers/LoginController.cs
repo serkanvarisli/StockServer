@@ -22,9 +22,9 @@ namespace StockServer.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] Login model)
+        public async Task<IActionResult> Login([FromBody] User model)
         {
-            var user = _stockDbContext.Login.FirstOrDefault(u => u.Username == model.Username);
+            var user = _stockDbContext.Users.FirstOrDefault(u => u.Username == model.Username);
             if (user != null && model.Username == user.Username && model.Password == user.Password)
             {
                 await HttpContext.SignOutAsync();
@@ -48,9 +48,7 @@ namespace StockServer.Controllers
 
                 return StatusCode(200, model.Username);
             }
-
             return BadRequest();
         }
-
     }
 }

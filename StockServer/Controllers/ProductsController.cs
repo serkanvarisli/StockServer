@@ -36,19 +36,19 @@ namespace StockServer.Controllers
 
             return Ok(products);
         }
-        [HttpGet("Category")]
-        public async Task<IActionResult> GetCategories()
-        {
-            var categories = await _stockDbContext.Categories
-                .ToListAsync();
-            return Ok(categories);
-        }
+        //[HttpGet("Category")]
+        //public async Task<IActionResult> GetCategories()
+        //{
+        //    var categories = await _stockDbContext.Categories
+        //        .ToListAsync();
+        //    return Ok(categories);
+        //}
         [HttpGet("Tags")]
         public async Task<IActionResult> GetTags()
         {
-            var Tags = await _stockDbContext.Tags
+            var tags = await _stockDbContext.Tags
                 .ToListAsync();
-            return Ok(Tags);
+            return Ok(tags);
         }
         [HttpPost]
         //[Authorize(Roles = "User")]
@@ -56,33 +56,26 @@ namespace StockServer.Controllers
         {
             var tags = await _stockDbContext.Tags.Where(c => createProductDTO.TagNames.Contains(c.Name)).ToListAsync();
 
-            if (_stockDbContext.Products.Any(p => p.Stock > 0))
+            var addProduct = new Product
             {
-                var addProduct = new Product
-                {
-                    CategoryId = createProductDTO.CategoryId,
-                    Name = createProductDTO.Name,
-                    Description = createProductDTO.Description,
-                    Stock = createProductDTO.Stock,
-                    Tags = tags,
-                };
+                CategoryId = createProductDTO.CategoryId,
+                Name = createProductDTO.Name,
+                Description = createProductDTO.Description,
+                Stock = createProductDTO.Stock,
+                Tags = tags,
+            };
 
-                // Sadece stok miktarı 0'dan büyükse ekleme yap
-                if (addProduct.Stock > 0)
-                {
-                    await _stockDbContext.Products.AddAsync(addProduct);
-                    await _stockDbContext.SaveChangesAsync();
-                    return StatusCode(201, addProduct.Id);
-                }
-                else
-                {
-                    return StatusCode(400, "Stok miktarı 0'dan büyük olmalıdır.");
-                }
+            if (addProduct.Stock > 0)
+            {
+                await _stockDbContext.Products.AddAsync(addProduct);
+                await _stockDbContext.SaveChangesAsync();
+                return StatusCode(201, addProduct.Id);
             }
             else
             {
-                return BadRequest();
+                return StatusCode(400, "Stok miktarı 0'dan büyük olmalıdır.");
             }
+
         }
 
         [HttpPut("{id}")]
@@ -105,12 +98,9 @@ namespace StockServer.Controllers
                 return BadRequest("Ürün bulunamadı.");
             }
 
-            // Yalnızca "Stock" alanını güncelle
             product.Stock = updateStockDTO.Stock;
-
             await _stockDbContext.SaveChangesAsync();
-
-            return Ok(product);
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
@@ -129,6 +119,5 @@ namespace StockServer.Controllers
             return NoContent();
         }
     }
-
 }
 
