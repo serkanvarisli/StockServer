@@ -50,9 +50,8 @@ namespace StockServer.Controllers
                 .ToListAsync();
             return Ok(Tags);
         }
-
-
         [HttpPost]
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> Create(CreateProductDTO createProductDTO)
         {
             var tags = await _stockDbContext.Tags.Where(c => createProductDTO.TagNames.Contains(c.Name)).ToListAsync();

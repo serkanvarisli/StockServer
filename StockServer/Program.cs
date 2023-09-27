@@ -14,6 +14,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("CanUpdateStock", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("",policy => policy.RequireRole("User"));
 });
 builder.Services.AddDbContext<StockDbContext>(options=>
 {
