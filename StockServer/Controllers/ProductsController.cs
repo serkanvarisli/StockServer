@@ -51,28 +51,41 @@ namespace StockServer.Controllers
             return Ok(Tags);
         }
         [HttpPost]
-        [Authorize(Roles = "User")]
+        //[Authorize(Roles = "User")]
         public async Task<IActionResult> Create(CreateProductDTO createProductDTO)
         {
             var tags = await _stockDbContext.Tags.Where(c => createProductDTO.TagNames.Contains(c.Name)).ToListAsync();
 
-            var addProduct = new Product
+            if (_stockDbContext.Products.Any(p => p.Stock > 0))
             {
-                CategoryId = createProductDTO.CategoryId,
-                Name = createProductDTO.Name,
-                Description = createProductDTO.Description,
-                Stock = createProductDTO.Stock,
-                Tags = tags,
-            };
+                var addProduct = new Product
+                {
+                    CategoryId = createProductDTO.CategoryId,
+                    Name = createProductDTO.Name,
+                    Description = createProductDTO.Description,
+                    Stock = createProductDTO.Stock,
+                    Tags = tags,
+                };
 
-            await _stockDbContext.Products.AddAsync(addProduct);
-
-            await _stockDbContext.SaveChangesAsync();
-
-            return StatusCode(201, addProduct.Id);
+                // Sadece stok miktarı 0'dan büyükse ekleme yap
+                if (addProduct.Stock > 0)
+                {
+                    await _stockDbContext.Products.AddAsync(addProduct);
+                    await _stockDbContext.SaveChangesAsync();
+                    return StatusCode(201, addProduct.Id);
+                }
+                else
+                {
+                    return StatusCode(400, "Stok miktarı 0'dan büyük olmalıdır.");
+                }
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
 
-        [HttpPut]
+        [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateStock(Guid id, UpdateProductDTO updateStockDTO)
         {
@@ -98,7 +111,7 @@ namespace StockServer.Controllers
 
             return Ok(product);
         }
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(Guid id)
         {
             var product = await _stockDbContext.Products.FirstOrDefaultAsync(p => p.Id == id);
@@ -111,7 +124,7 @@ namespace StockServer.Controllers
             _stockDbContext.Products.Remove(product);
             await _stockDbContext.SaveChangesAsync();
 
-            return NoContent(); 
+            return NoContent();
         }
     }
 
