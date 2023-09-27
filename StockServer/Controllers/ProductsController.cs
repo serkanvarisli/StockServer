@@ -36,20 +36,6 @@ namespace StockServer.Controllers
 
             return Ok(products);
         }
-        //[HttpGet("Category")]
-        //public async Task<IActionResult> GetCategories()
-        //{
-        //    var categories = await _stockDbContext.Categories
-        //        .ToListAsync();
-        //    return Ok(categories);
-        //}
-        [HttpGet("Tags")]
-        public async Task<IActionResult> GetTags()
-        {
-            var tags = await _stockDbContext.Tags
-                .ToListAsync();
-            return Ok(tags);
-        }
         [HttpPost]
         //[Authorize(Roles = "User")]
         public async Task<IActionResult> Create(CreateProductDTO createProductDTO)

@@ -4,7 +4,7 @@ using StockServer.Contexts;
 
 namespace StockServer.Controllers
 {
-    [Route("api/")]
+    [Route("api/[controller]")]
     [ApiController]
     public class TagsController : Controller
     {

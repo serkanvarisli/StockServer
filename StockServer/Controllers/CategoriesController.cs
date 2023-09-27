@@ -4,7 +4,7 @@ using StockServer.Contexts;
 
 namespace StockServer.Controllers
 {
-    [Route("api/")]
+    [Route("api/[controller]")]
     [ApiController]
     public class CategoriesController : Controller
     {
@@ -14,7 +14,7 @@ namespace StockServer.Controllers
             _stockDbContext = stockDbContext;
         }
         [HttpGet]
-        public async Task<IActionResult> GetCategories()
+        public async Task<IActionResult> GetAll()
         {
             var categories = await _stockDbContext.Categories
                 .ToListAsync();

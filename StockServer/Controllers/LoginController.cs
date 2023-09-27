@@ -22,13 +22,11 @@ namespace StockServer.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] User model)
+        public async Task<IActionResult> Login(User model)
         {
             var user = _stockDbContext.Users.FirstOrDefault(u => u.Username == model.Username);
             if (user != null && model.Username == user.Username && model.Password == user.Password)
             {
-                await HttpContext.SignOutAsync();
-
                 List<Claim> claims = new List<Claim>();
                 claims.Add(new Claim(ClaimTypes.NameIdentifier, model.Username));
 
@@ -49,6 +47,12 @@ namespace StockServer.Controllers
                 return StatusCode(200, model.Username);
             }
             return BadRequest();
+        }
+        [HttpPost("Logout")]
+        public async Task<IActionResult> Logout(User model)
+        {
+            await HttpContext.SignOutAsync();
+            return StatusCode(200,model.Username);
         }
     }
 }
