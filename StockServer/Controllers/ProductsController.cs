@@ -90,8 +90,17 @@ namespace StockServer.Controllers
         }
 
         [HttpDelete("{id}")]
+         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteProduct(Guid id)
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return StatusCode(401);
+            }
+            if (!User.IsInRole("Admin"))
+            {
+                return StatusCode(401);
+            }
             var product = await _stockDbContext.Products.FirstOrDefaultAsync(p => p.Id == id);
 
             if (product == null)
