@@ -11,7 +11,7 @@ using StockServer.Contexts;
 
 namespace StockServer.Controllers
 {
-    [Route("api/")]
+    [Route("api/[controller]")]
     [ApiController]
     public class LoginController : Controller
     {
@@ -21,7 +21,7 @@ namespace StockServer.Controllers
             _stockDbContext = stockDbContext;
         }
 
-        [HttpPost("login")]
+        [HttpPost]
         public async Task<IActionResult> Login(User model)
         {
             var user = _stockDbContext.Users.FirstOrDefault(u => u.Username == model.Username);
@@ -48,11 +48,11 @@ namespace StockServer.Controllers
             }
             return BadRequest();
         }
-        [HttpPost("Logout")]
-        public async Task<IActionResult> Logout(User model)
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync();
-            return StatusCode(200,model.Username);
+            return Ok();
         }
     }
 }
