@@ -8,6 +8,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using StockServer.Contexts;
+using StockServer.Token;
+using StockServer.DTOs.UserDTOs;
 
 namespace StockServer.Controllers
 {
@@ -16,42 +18,39 @@ namespace StockServer.Controllers
     public class LoginController : Controller
     {
         private readonly StockDbContext _stockDbContext;
-        public LoginController(StockDbContext stockDbContext)
+        private readonly ITokenHandler _tokenHandler;
+        public LoginController(StockDbContext stockDbContext, ITokenHandler tokenHandler)
         {
             _stockDbContext = stockDbContext;
+            _tokenHandler = tokenHandler;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(User model)
+        public async Task<IActionResult> Login(UserDto model)
         {
             var user = _stockDbContext.Users.FirstOrDefault(u => u.Username == model.Username);
-            if (user != null && model.Username == user.Username && model.Password == user.Password)
+
+            if (user == null || model.Password != user.Password)
             {
-                List<Claim> claims = new List<Claim>();
-                claims.Add(new Claim(ClaimTypes.NameIdentifier, model.Username));
-
-                if (user.Username != "admin")
-                {
-                    claims.Add(new Claim(ClaimTypes.Role, "User"));
-                }
-                else
-                {
-                    claims.Add(new Claim(ClaimTypes.Role, "Admin"));
-                }
-
-                ClaimsIdentity identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                ClaimsPrincipal principal = new ClaimsPrincipal(identity);
-
-                await HttpContext.SignInAsync(principal, new AuthenticationProperties() { IsPersistent = false });
-
-                return StatusCode(200, model.Username);
+                return BadRequest("Kullanıcı adı veya şifre hatalı.");
             }
-            return BadRequest();
+            var authClaims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name,user.Username),
+                    new Claim(ClaimTypes.Role,user.Role.ToString()),
+                    new Claim(JwtRegisteredClaimNames.Jti,new Guid().ToString()),
+                };
+            var token = _tokenHandler.CreateAccessToken(7, authClaims);
+
+            token.UserId = user.Id;
+            token.Username = user.Username;
+
+            return Ok(token);
         }
+
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync();
             return Ok();
         }
     }

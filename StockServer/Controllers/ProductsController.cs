@@ -65,17 +65,9 @@ namespace StockServer.Controllers
         }
 
         [HttpPut("{id}")]
-        // [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateStock(Guid id, UpdateProductDTO updateStockDTO)
         {
-            //if (!User.Identity.IsAuthenticated)
-            //{
-            //    return Unauthorized();
-            //}
-            //if (!User.IsInRole("Admin"))
-            //{
-            //    return Forbid();
-            //}
 
             var product = await _stockDbContext.Products.FirstOrDefaultAsync(p => p.Id == id);
 

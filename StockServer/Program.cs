@@ -1,24 +1,47 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using StockServer.Contexts;
+using StockServer.Entities;
+using StockServer.Token;
+using System.Reflection.Emit;
+using System;
+using System.Security.Claims;
+using System.Text;
+using StockServer.SeedData;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
     {
-        options.LoginPath = "/Login/Login";
-        options.AccessDeniedPath = "/Login/AccessDenied"; 
+        options.TokenValidationParameters = new()
+        {
+            ValidateAudience = true,
+            ValidateIssuer = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidAudience = builder.Configuration["Token:Audience"],
+            ValidIssuer = builder.Configuration["Token:Issuer"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Token:SecurityKey"])),
+            LifetimeValidator = (notBefore, expires, securityToken, validationParameters) => expires != null ? expires > DateTime.UtcNow : false,
+            NameClaimType = ClaimTypes.Name,
+        };
     });
+builder.Services.AddScoped<ITokenHandler, StockServer.Token.TokenHandler>();
+builder.Services.Configure<JwtBearerOptions>(builder.Configuration.GetSection("Authentication:JwtBearer"));
 
-builder.Services.AddAuthorization(options =>
+builder.Services.AddDbContext<StockDbContext>(options =>
 {
-    options.AddPolicy("CanUpdateStock", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("",policy => policy.RequireRole("User"));
-});
+    //options.UseInMemoryDatabase(builder.Configuration.GetConnectionString("DefaultConnection"));
 
-builder.Services.AddDbContext<StockDbContext>(options=>
-{
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
@@ -35,6 +58,7 @@ builder.Services.AddCors(
         .AllowAnyHeader()
 )
     );
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -43,6 +67,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+// for InMemory db
+//var scope = app.Services.CreateScope();
+//var context = scope.ServiceProvider.GetService<StockDbContext>();
+//CreateSeedData.SeedData(context);
+
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
@@ -54,3 +83,5 @@ app.MapControllers();
 app.UseCors("corspolicy");
 
 app.Run();
+
+

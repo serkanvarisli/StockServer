@@ -12,8 +12,8 @@ using StockServer.Contexts;
 namespace StockServer.Migrations
 {
     [DbContext(typeof(StockDbContext))]
-    [Migration("20230923202439_firstUpdate")]
-    partial class firstUpdate
+    [Migration("20230929053806_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,32 +25,25 @@ namespace StockServer.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("CategoryProduct", b =>
+            modelBuilder.Entity("ProductTag", b =>
                 {
-                    b.Property<int>("CategoriesId")
-                        .HasColumnType("int");
-
                     b.Property<Guid>("ProductsId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("CategoriesId", "ProductsId");
+                    b.Property<int>("TagsId")
+                        .HasColumnType("int");
 
-                    b.HasIndex("ProductsId");
+                    b.HasKey("ProductsId", "TagsId");
 
-                    b.ToTable("CategoryProduct");
+                    b.HasIndex("TagsId");
+
+                    b.ToTable("ProductTag");
                 });
 
             modelBuilder.Entity("StockServer.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -67,6 +60,9 @@ namespace StockServer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -80,10 +76,12 @@ namespace StockServer.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CategoryId");
+
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("StockServer.Entities.SubCategory", b =>
+            modelBuilder.Entity("StockServer.Entities.Tag", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -91,39 +89,58 @@ namespace StockServer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId");
-
-                    b.ToTable("SubCategories");
+                    b.ToTable("Tags");
                 });
 
-            modelBuilder.Entity("CategoryProduct", b =>
+            modelBuilder.Entity("StockServer.Entities.User", b =>
                 {
-                    b.HasOne("StockServer.Entities.Category", null)
-                        .WithMany()
-                        .HasForeignKey("CategoriesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("ProductTag", b =>
+                {
                     b.HasOne("StockServer.Entities.Product", null)
                         .WithMany()
                         .HasForeignKey("ProductsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("StockServer.Entities.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
-            modelBuilder.Entity("StockServer.Entities.SubCategory", b =>
+            modelBuilder.Entity("StockServer.Entities.Product", b =>
                 {
                     b.HasOne("StockServer.Entities.Category", "Category")
-                        .WithMany("SubCategories")
+                        .WithMany("Products")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -133,7 +150,7 @@ namespace StockServer.Migrations
 
             modelBuilder.Entity("StockServer.Entities.Category", b =>
                 {
-                    b.Navigation("SubCategories");
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

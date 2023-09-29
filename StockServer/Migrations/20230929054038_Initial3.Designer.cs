@@ -12,8 +12,8 @@ using StockServer.Contexts;
 namespace StockServer.Migrations
 {
     [DbContext(typeof(StockDbContext))]
-    [Migration("20230927173221_UserAndProduct")]
-    partial class UserAndProduct
+    [Migration("20230929054038_Initial3")]
+    partial class Initial3
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,10 +43,7 @@ namespace StockServer.Migrations
             modelBuilder.Entity("StockServer.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -77,14 +74,9 @@ namespace StockServer.Migrations
                     b.Property<int>("Stock")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Products");
                 });
@@ -118,7 +110,7 @@ namespace StockServer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("Role")
                         .HasColumnType("int");
 
                     b.Property<string>("Username")
@@ -127,9 +119,7 @@ namespace StockServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Login");
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("ProductTag", b =>
@@ -155,32 +145,12 @@ namespace StockServer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("StockServer.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Category");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("StockServer.Entities.User", b =>
-                {
-                    b.HasOne("StockServer.Entities.User", null)
-                        .WithMany("Users")
-                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("StockServer.Entities.Category", b =>
                 {
                     b.Navigation("Products");
-                });
-
-            modelBuilder.Entity("StockServer.Entities.User", b =>
-                {
-                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

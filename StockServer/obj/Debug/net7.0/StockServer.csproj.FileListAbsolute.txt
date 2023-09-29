@@ -74,3 +74,5 @@ D:\Codding\Programming\.net\StockSln\StockServer\obj\Debug\net7.0\refint\StockSe
 D:\Codding\Programming\.net\StockSln\StockServer\obj\Debug\net7.0\StockServer.pdb
 D:\Codding\Programming\.net\StockSln\StockServer\obj\Debug\net7.0\StockServer.genruntimeconfig.cache
 D:\Codding\Programming\.net\StockSln\StockServer\obj\Debug\net7.0\ref\StockServer.dll
+D:\Codding\Programming\.net\StockSln\StockServer\bin\Debug\net7.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\Codding\Programming\.net\StockSln\StockServer\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.InMemory.dll
