@@ -13,26 +13,50 @@ namespace StockServer.SeedData
              new User
              {
                 Id = 1,
+                Username = "admin",
                 Password = "123",
-                Role = StockServer.Enums.UserRole.Admin,
-                Username = "admin"
+                Role = StockServer.Enums.UserRole.Admin
              },
             new User
             {
                 Id = 2,
+                Username = "user",
                 Password = "123",
-                Role = StockServer.Enums.UserRole.User,
-                Username = "user"
+                Role = StockServer.Enums.UserRole.User
             }};
 
-            var category = new Category
+
+            var defaultCategories = new List<Category>
             {
-                Id = 1,
-                Name = "Kategori 1"
-            };
+             new Category
+             {
+                 Id = 1,
+                Name="Kategori 1",
+
+             },
+            new Category
+            {
+                Id=2,
+                Name="Kategori 2"
+            }};
+            var defaulTag = new List<Tag>
+            {
+             new Tag
+             {
+                 Id = 1,
+                Name="Etiket 1",
+
+             },
+            new Tag
+            {
+                Id=2,
+                Name="Etiket 2"
+            }};
 
             context.Users.AddRangeAsync(defaultUsers);
-            context.Categories.Add(category);
+            context.Categories.AddRangeAsync(defaultCategories);
+            context.Tags.AddRangeAsync(defaulTag);
+
             context.SaveChanges();
         }
     }

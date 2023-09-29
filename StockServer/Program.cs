@@ -40,6 +40,8 @@ builder.Services.Configure<JwtBearerOptions>(builder.Configuration.GetSection("A
 
 builder.Services.AddDbContext<StockDbContext>(options =>
 {
+    //inmemory db için
+    //ayrýca aþaðýda yer alan in memory db için yazan kodlarý da aktifleþtirmek gerekiyor
     //options.UseInMemoryDatabase(builder.Configuration.GetConnectionString("DefaultConnection"));
 
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
@@ -67,10 +69,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-// for InMemory db
+//  InMemory db için
 //var scope = app.Services.CreateScope();
 //var context = scope.ServiceProvider.GetService<StockDbContext>();
 //CreateSeedData.SeedData(context);
+
 
 app.UseHttpsRedirection();
 

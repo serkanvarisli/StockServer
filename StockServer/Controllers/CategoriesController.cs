@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StockServer.Contexts;
 
@@ -6,6 +7,8 @@ namespace StockServer.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
+    [Authorize]
     public class CategoriesController : Controller
     {
         private readonly StockDbContext _stockDbContext;
