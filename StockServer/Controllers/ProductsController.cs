@@ -18,6 +18,7 @@ namespace StockServer.Controllers
             _stockDbContext = stockDbContext;
         }
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAll()
         {
             var products = await _stockDbContext.Products
@@ -37,7 +38,7 @@ namespace StockServer.Controllers
             return Ok(products);
         }
         [HttpPost]
-        //[Authorize(Roles = "User")]
+        [Authorize]
         public async Task<IActionResult> Create(CreateProductDTO createProductDTO)
         {
             var tags = await _stockDbContext.Tags.Where(c => createProductDTO.TagNames.Contains(c.Name)).ToListAsync();
@@ -65,7 +66,7 @@ namespace StockServer.Controllers
         }
 
         [HttpPut("{id}")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> UpdateStock(Guid id, UpdateProductDTO updateStockDTO)
         {
 
@@ -82,7 +83,7 @@ namespace StockServer.Controllers
         }
 
         [HttpDelete("{id}")]
-         [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteProduct(Guid id)
         {
             if (!User.Identity.IsAuthenticated)
